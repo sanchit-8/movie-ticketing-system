@@ -4,25 +4,25 @@
 #include<iostream>
 #include<fstream>
 
-//hello i am sanchit goel how are you
+
 using namespace std;
 
 COORD coord={0,0};
 
-void gotoxy(int x,int y);
-void SetColor(int ForgC);
-void box();
-void admin();
-void book_ticket();
+void gotoxy(int x,int y);           //function to set the cursor
+void SetColor(int ForgC);           //function to set the color
+void box();                         //function to display the box
+void admin();                       //function for admin menu in the main menu
+void book_ticket();                 //function for booking tickets menu
 void seats(int cd);
 
-class show
+class show                          //class having the details of all the movies
 {
 public:
     char movie_name[50];
     int mv_cd,ticket_cost,tno_s,s_res;
     int seat[11][20];
-public:
+
     void add()
     {
         system("cls");              //add the given show to the file
@@ -52,17 +52,17 @@ public:
         //cout<<"get details";
         fstream f1;
         f1.open("movie.dat",ios::in|ios::binary);
-        f1.seekg((sizeof(show)*(m_cd-1)),ios::beg);
+        f1.seekg((sizeof(show)*(m_cd-1)),ios::beg);         //jump to the required movie record
         f1.read((char*)this,sizeof(show));
         f1.close();
     }
-    void rem()
+    void rem()                      //to be made
     {
         system("cls");              //remove the asked show from the file
         cout<<"remove";
         getch();
     }
-    void reset()
+    void reset()                //to be made
     {
         system("cls");
         cout<<"reset";       //reset the seat array to 0
@@ -104,7 +104,7 @@ public:
                         //append the record in tickets.dat
                         //and overwrite the record in show.dat
         fstream f1;
-        f1.open("tickets.dat",ios::app||ios::binary);
+        //f1.open("tickets.dat",ios::app||ios::binary);
 
         getch();
 
@@ -194,6 +194,80 @@ public:
         }
         gotoxy(40,40);                          //moves to pointer to the position out of the layout
     }
+    void get_det()
+    {
+        char ans='N';
+        int check=1,i=0;
+        while(ans=='N'||ans=='n')              //accepts details after checking all the details
+        {
+            {                                  //clear the input area for the new input
+                gotoxy(73,20);cout<<"                               ";
+                gotoxy(73,21);cout<<"                               ";
+                gotoxy(73,22);cout<<"                               ";
+                gotoxy(73,23);cout<<"                               ";
+            }
+            fflush(stdin);
+            gotoxy(40,18);cout<<"ENTER THE FOLLOWING DETAILS :";
+            gotoxy(40,20);cout<<"NAME                        :";
+            gotoxy(40,21);cout<<"PHONE NUMBER                :";
+            gotoxy(40,22);cout<<"MOVIE CODE                  :";
+            gotoxy(40,23);cout<<"NUMBER OF TICKET            :";
+
+            gotoxy(73,20);gets(this->c1.c_name);   //accepts name
+            for(i=0;i<strlen(this->c1.c_name);i++) //change the case of each letter to upper
+            {
+                this->c1.c_name[i]=toupper(this->c1.c_name[i]);
+            }
+
+            while(1)                  //accepts the phn no. & check if its 10-digits
+            {
+                gotoxy(73,21);gets(this->c1.phn_no);
+                if(strlen(this->c1.phn_no)==10)
+                {
+                    gotoxy(90,21);cout<<"                               ";
+                    break;
+                }
+                gotoxy(73,21);cout<<"                   ";
+                gotoxy(90,21);cout<<"PLEASE ENTER A 10-DIGIT NUMBER";
+            }
+
+            while(1)                 //accepts the movie code b/w 1&5
+            {
+                gotoxy(73,22);cin>>this->show_cd;
+                if(this->show_cd==1||this->show_cd==2||this->show_cd==3||this->show_cd==4||this->show_cd==5)
+                {
+                    gotoxy(95,22);cout<<"                                          ";
+                    break;
+                }
+                gotoxy(73,22);cout<<"      ";
+                gotoxy(95,22);cout<<"PLEASE INPUT A VALID MOVIE CODE";
+            }
+
+            while(1)                 //accepts no. tickets to be booked not more the 10
+            {
+                gotoxy(73,23);cin>>this->n_o_t;
+                if(this->n_o_t<=10&&this->n_o_t>0)
+                {
+                    gotoxy(95,23);cout<<"                                                   ";
+                    break;
+                }
+                gotoxy(73,23);cout<<"      ";
+                gotoxy(95,23);cout<<"YOU CAN NOT BOOK MORE THAN 10 TICKETS AT A TIME";
+            }
+
+            gotoxy(40,18);printf("PLEASE CONFIRM YOUR DETAIS  :");      //confirms the details
+            gotoxy(73,20);puts(this->c1.c_name);                              //displays all the details accepted
+            gotoxy(73,21);puts(this->c1.phn_no);
+            gotoxy(73,22);cout<<this->show_cd;
+            gotoxy(73,23);cout<<this->n_o_t;
+            fflush(stdin);
+            gotoxy(40,25);cout<<"ARE YOUR DETAILS CORRECT (Y/N) : ";
+            cin>>ans;
+            ans=toupper(ans);
+
+            this->s1.get_det(this->show_cd);
+        }
+    }
 
     print();
     cancel();
@@ -244,7 +318,7 @@ int main()
          }
 
     }
-
+    return 0;
 }
 
 void gotoxy(int x,int y)                    //to position the pointer
@@ -347,106 +421,31 @@ void admin()
 void book_ticket()
 {
     {    //movie list showcase
-    system("cls");
-    box();
-    show s1;                                  //display the outer box
-    gotoxy(72,3);printf("WELCOME TO SHOW BOX");
-    gotoxy(71,4);printf("---------------------");
-    gotoxy(40,7);printf("MOVIE NAME");
-    gotoxy(60,7);printf("COST OF TICKET");
-    gotoxy(85,7);printf("MOVIE CODE");
-    gotoxy(105,7);printf("NO. OF SEATS LEFT");
-    for(int i=1;i<=5;i++)
-    {
-        s1.get_det(i);
-        gotoxy(40,9+i);cout<<s1.movie_name;
-        gotoxy(60,9+i);cout<<s1.ticket_cost;
-        gotoxy(85,9+i);cout<<s1.mv_cd;
-        gotoxy(105,9+i);cout<<(s1.tno_s-s1.s_res);
+        system("cls");
+        box();
+        show s1;                                  //display the outer box
+        gotoxy(72,3);cout<<"WELCOME TO SHOW BOX";
+        gotoxy(71,4);cout<<"---------------------";
+        gotoxy(40,7);cout<<"MOVIE NAME";
+        gotoxy(60,7);cout<<"COST OF TICKET";
+        gotoxy(85,7);cout<<"MOVIE CODE";
+        gotoxy(105,7);cout<<"NO. OF SEATS LEFT";
+        for(int i=1;i<=5;i++)
+        {
+            s1.get_det(i);
+            gotoxy(40,9+i);cout<<s1.movie_name;
+            gotoxy(60,9+i);cout<<s1.ticket_cost;
+            gotoxy(85,9+i);cout<<s1.mv_cd;
+            gotoxy(105,9+i);cout<<(s1.tno_s-s1.s_res);
+        }
     }
 
-    }
     ticket t1;
+    t1.get_det();           //get the details of the tickets,customer
 
-    char ans='N';
-    int check=1,i=0;
-    while(ans=='N'||ans=='n')              //accepts details after checking all the details
-    {
-
-        fflush(stdin);
-        gotoxy(40,18);printf("ENTER THE FOLLOWING DETAILS : ");
-        gotoxy(40,20);printf("NAME");gotoxy(68,20);printf(":");
-        gotoxy(40,21);printf("PHONE NUMBER");gotoxy(68,21);printf(":");
-        gotoxy(40,22);printf("MOVIE CODE");gotoxy(68,22);printf(":");
-        gotoxy(40,23);printf("NUMBER OF TICKET");gotoxy(68,23);printf(":");
-
-        gotoxy(73,20);gets(t1.c1.c_name);   //accepts name
-        for(i=0;i<strlen(t1.c1.c_name);i++) //change the case of each letter to upper
-        {
-            t1.c1.c_name[i]=toupper(t1.c1.c_name[i]);
-        }
-
-        check=1;
-        while(check==1)                  //accepts the phn no. & check if its 10-digits
-        {
-            gotoxy(73,21);gets(t1.c1.phn_no);
-            if(strlen(t1.c1.phn_no)==10)
-            {
-                check=0;
-                gotoxy(90,21);printf("                               ");
-                break;
-            }
-            gotoxy(73,21);printf("                   ");
-            gotoxy(90,21);printf("PLEASE ENTER A 10-DIGIT NUMBER");
-        }
-
-        check=1;
-        while(check==1)                 //accepts the movie code b/w 1&5
-        {
-            gotoxy(73,22);cin>>t1.show_cd;
-            if(t1.show_cd==1||t1.show_cd==2||t1.show_cd==3||t1.show_cd==4||t1.show_cd==5)
-            {
-                check=0;
-                gotoxy(95,22);printf("                                          ");
-                break;
-            }
-            gotoxy(73,22);printf("      ");
-            gotoxy(95,22);printf("PLEASE INPUT A VALID MOVIE CODE");
-
-        }
-        check=1;
-
-        while(check==1)                 //accepts no. tickets to be booked not more the 10
-        {
-            gotoxy(73,23);cin>>t1.n_o_t;
-            if(t1.n_o_t<=10&&t1.n_o_t>0)
-            {
-                check=0;
-                gotoxy(95,23);printf("                                                   ");
-                break;
-            }
-            gotoxy(73,23);printf("      ");
-            gotoxy(95,23);printf("YOU CAN NOT BOOK MORE THAN 10 TICKETS AT A TIME");
-
-        }
-        check=1;
-
-        gotoxy(40,18);printf("PLEASE CONFIRM YOUR DETAIS  :");      //confirms the details
-        gotoxy(73,20);puts(t1.c1.c_name);                              //displays all the details accepted
-        gotoxy(73,21);puts(t1.c1.phn_no);
-        gotoxy(73,22);cout<<t1.show_cd;
-        gotoxy(73,23);cout<<t1.n_o_t;
-        fflush(stdin);
-        gotoxy(40,25);cout<<"ARE YOUR DETAILS CORRECT (Y/N) : ";
-        cin>>ans;
-        ans=toupper(ans);
-
-    }
-    t1.s1.get_det(t1.show_cd);
-
-            // seats(chairs),ticket id(tic_id)
+            //initialize seats(chairs),ticket id(tic_id)
     cout<<t1.s1.movie_name;
-    t1.book();                  //go to the booking theature and select the wantedc seats
+    t1.book();                  //go to the booking theature and select the wanted seats and get the selected seats
     //cout<<t1.s1.movie_name;
 
 
