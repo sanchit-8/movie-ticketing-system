@@ -7,7 +7,7 @@
 
 using namespace std;
 
-COORD coord={0,0};
+COORD coord={0,0};                  //global variable for gotoxy
 
 void gotoxy(int x,int y);           //function to set the cursor
 void SetColor(int ForgC);           //function to set the color
@@ -92,19 +92,26 @@ public:
     int chairs[2][10];
 
 public:
+    ticket()
+    {
+        for(int i=0;i<10;i++)               //set the seats to be -1 -1 (no seats)  in details
+        {
+            this->chairs[0][i]=-1;
+            this->chairs[1][i]=-1;
+        }
+    }
     void book()                 //working on right now
     {
         cout<<"hello book your ticket";
         getch();
         system("cls");
-        seats(show_cd);             //displays the theature and return the control
+        seats(this->show_cd);             //displays the theature and return the control
         //now get the details of the booked tickets in the 2-d array by mov function
         this->mov();
                         //now rewrite the edited files back
                         //append the record in tickets.dat
                         //and overwrite the record in show.dat
-        fstream f1;
-        //f1.open("tickets.dat",ios::app||ios::binary);
+
 
         getch();
 
@@ -269,7 +276,17 @@ public:
         }
     }
 
-    print();
+    void print()
+    {
+
+        fstream f1;
+        f1.open("details.dat",ios::in|ios::binary);
+        while(f1.read((char*)this,sizeof(ticket)))
+        {
+            cout<<this->tic_id<<" "<<this->n_o_t<<" "<<this->show_cd<<" "<<this->c1.c_name<<" "<<this->c1.phn_no<<endl;
+        }
+        f1.close();
+    }
     cancel();
     get();
 };
@@ -307,8 +324,10 @@ int main()
                 break;
           //  case '2': canc_tics();
           //      break;
-          //  case '3': check_det();
-          //      break;
+            case '3': {ticket t1;
+                    t1.print();
+                    getch();}
+                break;
             case '4': admin();
                 break;
             case '0': ch=0;
@@ -418,7 +437,7 @@ void admin()
 
 }
 
-void book_ticket()
+void book_ticket()              //work here
 {
     {    //movie list showcase
         system("cls");
@@ -440,30 +459,55 @@ void book_ticket()
         }
     }
 
-    ticket t1;
+    ticket t1,t2;
     t1.get_det();           //get the details of the tickets,customer
 
+
             //initialize seats(chairs),ticket id(tic_id)
-    cout<<t1.s1.movie_name;
+    cout<<t1.s1.movie_name;    //just a check
+
     t1.book();                  //go to the booking theature and select the wanted seats and get the selected seats
     //cout<<t1.s1.movie_name;
+    fstream fin,fout;
+    fin.open("details.dat",ios::in|ios::binary);
+    fout.open("details.dat",ios::app|ios::binary);
+    fin.seekg(0,ios::end);
+    if(fin.tellg()==0)
+    {
+        cout<<"first rec"<<fin.tellg();
+        t1.tic_id=1;
+    }
+    else
+    {
+        fin.seekg(-1100,ios::cur);
+        fin.read((char*)&t2,sizeof(ticket));
+        cout<<"pre id is"<<t2.tic_id<<t2.c1.c_name;
+        t1.tic_id=t2.tic_id+1;
 
+    }
+    cout<<"id is "<<t1.tic_id;
+    fout.write((char*)&t1,sizeof(ticket));
+    fin.close();
+    fout.close();
+    fin.open("movie.dat",ios::in|ios::out|ios::binary);
+    fin.seekg(((t1.show_cd-1)*sizeof(show)),ios::beg);
+    fin.write((char*)&(t1.s1),(sizeof(show)));
+    fin.close();
 
+    //cout<<t1.tic_id;
     getch();
 }
 
 void seats(int cd)           //displays the seating arrangement and return nothing to the called place
 {
     system("cls");
-
+    box();                    //displays border
     int i=0,j=0,z=0,x;
     int seats_a[11][20];
     char a;
 
     show s1;
     s1.get_det(cd);                                    // get the details of the desired movie
-
-    box();                                             //displays border
 
     for(j=0;j<11;j++)                                  //displays the seats booked in blue and empty in white
     {
@@ -515,4 +559,5 @@ void seats(int cd)           //displays the seating arrangement and return nothi
 //----------------------------------------------------------------
     //returns to the function called
 }
+
 
