@@ -3,6 +3,7 @@
 #include<windows.h>
 #include<iostream>
 #include<fstream>
+#include<queue>
 
 
 using namespace std;
@@ -15,6 +16,8 @@ void box();                         //function to display the box
 void admin();                       //function for admin menu in the main menu
 void book_ticket();                 //function for booking tickets menu
 void seats(int cd);
+void canc_tics();
+void allot(int r,int c,int a_id);
 
 class show                          //class having the details of all the movies
 {
@@ -23,21 +26,21 @@ public:
     int mv_cd,ticket_cost,tno_s,s_res;
     int seat[11][20];
 
-    void add()
+    void add()                      //appends a new record in the file
     {
         system("cls");              //add the given show to the file
         cout<<"ENTER THE DETAILS - \n";
         cout<<"MOVIE NAME : ";
-        cin>>movie_name;
+        cin>>this->movie_name;
         cout<<"MOVIE CODE : ";
-        cin>>mv_cd;
+        cin>>this->mv_cd;
         cout<<"COST OF TICKET : ";
-        cin>>ticket_cost;
-        tno_s=220;
-        s_res=0;
+        cin>>this->ticket_cost;
+        this->tno_s=220;
+        this->s_res=0;
         for(int i=0;i<11;i++)
             for(int j=0;j<20;j++)
-                seat[i][j]=0;
+                this->seat[i][j]=0;
         // now write it in file show.dat
         cout<<this->movie_name;
         fstream f1;
@@ -46,7 +49,7 @@ public:
         f1.close();
         getch();
     }
-    void get_det(int m_cd)
+    void get_det(int m_cd)          //read the asked record in this class
     {
         //system("cls");
         //cout<<"get details";
@@ -56,18 +59,35 @@ public:
         f1.read((char*)this,sizeof(show));
         f1.close();
     }
-    void rem()                      //to be made
+    void rem()                      //truncate all the files
     {
-        system("cls");              //remove the asked show from the file
+        char ans;
+        system("cls");              //remove all the records from the file
         cout<<"remove";
+        cout<<endl<<"do you want to remove all the records";
+        cin>>ans;
+        if(ans=='y'||ans=='Y')
+        {
+            fstream ft;
+            ft.open("details.dat",ios::out|ios::binary);
+            ft.close();
+            ft.open("movie.dat",ios::out|ios::binary);
+            ft.close();
+            ft.open("show1.dat",ios::out|ios::binary);
+            ft.close();
+            ft.open("show2.dat",ios::out|ios::binary);
+            ft.close();
+            ft.open("show3.dat",ios::out|ios::binary);
+            ft.close();
+            ft.open("show4.dat",ios::out|ios::binary);
+            ft.close();
+            ft.open("show5.dat",ios::out|ios::binary);
+            ft.close();
+        }
+        cout<<"\n ALL THE FILE HAVE BEEN TRUNCATED";
         getch();
     }
-    void reset()                //to be made
-    {
-        system("cls");
-        cout<<"reset";       //reset the seat array to 0
-        getch();
-    }
+
 
 };
 
@@ -91,8 +111,7 @@ public:
     int n_o_t;
     int chairs[2][10];
 
-public:
-    ticket()
+    ticket()                //constructor to initialize the values of booked seat to -1,-1 that is unreserved
     {
         for(int i=0;i<10;i++)               //set the seats to be -1 -1 (no seats)  in details
         {
@@ -102,17 +121,12 @@ public:
     }
     void book()                 //working on right now
     {
-        cout<<"hello book your ticket";
+        //cout<<"hello book your ticket";
         getch();
         system("cls");
         seats(this->show_cd);             //displays the theature and return the control
-        //now get the details of the booked tickets in the 2-d array by mov function
-        this->mov();
-                        //now rewrite the edited files back
-                        //append the record in tickets.dat
-                        //and overwrite the record in show.dat
 
-
+        this->mov();                        //choose the dezired seats
         getch();
 
     }
@@ -228,7 +242,7 @@ public:
 
             while(1)                  //accepts the phn no. & check if its 10-digits
             {
-                gotoxy(73,21);gets(this->c1.phn_no);
+                gotoxy(73,21);gets(this ->c1.phn_no);
                 if(strlen(this->c1.phn_no)==10)
                 {
                     gotoxy(90,21);cout<<"                               ";
@@ -278,16 +292,74 @@ public:
 
     void print()
     {
-
-        fstream f1;
-        f1.open("details.dat",ios::in|ios::binary);
-        while(f1.read((char*)this,sizeof(ticket)))
-        {
-            cout<<this->tic_id<<" "<<this->n_o_t<<" "<<this->show_cd<<" "<<this->c1.c_name<<" "<<this->c1.phn_no<<endl;
-        }
-        f1.close();
+        cout<<"ID : "<<this->tic_id<<endl;
+        cout<<"NAME : "<<this->c1.c_name<<endl;
+        cout<<"PHONE NO. : "<<this->c1.phn_no<<endl;
+        cout<<"MOVIE CODE : "<<this->show_cd<<endl;
+        cout<<"MOVIE NAME : "<<this->s1.movie_name<<endl;
+        cout<<"SEATS : ";
+            for(int i=0;i<this->n_o_t;i++)
+            {
+                if(this->chairs[0][i]==-3)
+                    cout<<" C ";
+                else if(this->chairs[0][i]==-2)
+                    cout<<" W ";
+                else if(this->chairs[0][i]==-1)
+                    cout<<"   ";
+                else
+                    printf(" %c%d ",(this->chairs[0][i]+65),this->chairs[1][i]+1);
+            }
+            cout<<endl<<"AMOUNT : "<<(this->n_o_t)*(this->s1.ticket_cost);
     }
-    cancel();
+    void waitlist()
+    {
+        //cout<<"waitist";
+        fstream fw;
+        switch(this->show_cd)
+        {
+            case 1 :fw.open("show1.dat",ios::app|ios::binary);
+                break;
+            case 2 :fw.open("show2.dat",ios::app|ios::binary);
+                break;
+            case 3 :fw.open("show3.dat",ios::app|ios::binary);
+                break;
+            case 4 :fw.open("show4.dat",ios::app|ios::binary);
+                break;
+            case 5 :fw.open("show5.dat",ios::app|ios::binary);
+                break;
+            default: ;
+        }
+        int waitno;
+        fw.seekg(0,ios::end);
+        waitno=(fw.tellg()/sizeof(this->tic_id));
+        cout<<"waitno:"<<waitno;
+        cout<<"WAITING AVAILABLE : ";
+        for(int i=1;i<=this->n_o_t;i++)
+        {
+            cout<<waitno+i<<" ";
+        }
+        char ans;
+        cout<<endl<<"DO YOU WANT TO BOOK TICKETS (Y/N): ";
+        cin>>ans;
+        if(ans=='y'||ans=='Y')
+        {
+            //fw.write((char*)&(this->tic_id),sizeof(this->tic_id));
+            for(int i=1;i<=this->n_o_t;i++)
+            {
+                this->chairs[0][i]=-2;              //set the status of the seats to be waiting
+                fw.write((char*)&(this->tic_id),sizeof(this->tic_id));
+            }
+        }
+        fw.close();
+        getch();
+    }
+
+    void cancel()
+    {
+        int d_id;
+        cout<<"enter";
+    }
+
     get();
 };
 
@@ -316,17 +388,27 @@ int main()
         gotoxy(100,14);cout<<"0";
 
         gotoxy(62,17);cout<<"ENTER YOUR OPTION :         ";
-        scanf("%c",&opt);
+        cin>>opt;
 
         switch(opt)
         {
             case '1': book_ticket();
                 break;
-          //  case '2': canc_tics();
-          //      break;
-            case '3': {ticket t1;
-                    t1.print();
-                    getch();}
+            case '2': canc_tics();
+                break;
+            case '3':{  ticket t1;              //print ticket
+                        int id;
+                        system("cls");
+                        cout<<"ENTER THE TICKET ID";
+                        cin>>id;
+                        fstream f1;
+                        f1.open("details.dat",ios::in|ios::binary);
+                        f1.seekg((sizeof(ticket)*(id-1)),ios::beg);
+                        f1.read((char*)&t1,sizeof(ticket));
+                        t1.print();
+                        f1.close();
+                        getch();
+                    }
                 break;
             case '4': admin();
                 break;
@@ -384,7 +466,7 @@ void box()                                  //displays the outer box
     }
 }
 
-void admin()
+void admin()                                //manage the movies
 {
     char opt;
     int ch=1;
@@ -399,14 +481,12 @@ void admin()
         gotoxy(72,6) ;cout<<"ADMIN MENU";
         gotoxy(50,10);cout<<"ADD SHOW";
         gotoxy(50,11);cout<<"REMOVE SHOW";
-        gotoxy(50,12);cout<<"RESET SHOW";
-        gotoxy(50,13);cout<<"VIEW SHOW DETAILS";
+        gotoxy(50,12);cout<<"VIEW SHOW DETAILS";
         gotoxy(50,14);cout<<"EXIT";
 
         gotoxy(100,10);cout<<"1";
         gotoxy(100,11);cout<<"2";
         gotoxy(100,12);cout<<"3";
-        gotoxy(100,13);cout<<"4";
         gotoxy(100,14);cout<<"0";
 
         gotoxy(62,17);cout<<"ENTER YOUR OPTION :         ";
@@ -417,9 +497,7 @@ void admin()
                 break;
             case '2': s1.rem();
                 break;
-            case '3': s1.reset();
-                break;
-            case '4': system("cls");            //view details
+            case '3': system("cls");            //view details
                       for(int i=1;i<6;i++)
                       {
                         s1.get_det(i);
@@ -437,12 +515,12 @@ void admin()
 
 }
 
-void book_ticket()              //work here
+void book_ticket()              //accept the info book the asked seats
 {
-    {    //movie list showcase
+    {                           //movie list showcase
         system("cls");
-        box();
-        show s1;                                  //display the outer box
+        box();                  //display the outer box
+        show s1;
         gotoxy(72,3);cout<<"WELCOME TO SHOW BOX";
         gotoxy(71,4);cout<<"---------------------";
         gotoxy(40,7);cout<<"MOVIE NAME";
@@ -462,40 +540,218 @@ void book_ticket()              //work here
     ticket t1,t2;
     t1.get_det();           //get the details of the tickets,customer
 
-
-            //initialize seats(chairs),ticket id(tic_id)
-    cout<<t1.s1.movie_name;    //just a check
-
-    t1.book();                  //go to the booking theature and select the wanted seats and get the selected seats
-    //cout<<t1.s1.movie_name;
-    fstream fin,fout;
+    fstream fin;                      //generates the booking id
     fin.open("details.dat",ios::in|ios::binary);
-    fout.open("details.dat",ios::app|ios::binary);
     fin.seekg(0,ios::end);
-    if(fin.tellg()==0)
+    if(fin.tellg()==0)                          //if it is the first record give the id 1
     {
         cout<<"first rec"<<fin.tellg();
         t1.tic_id=1;
     }
-    else
+    else                                        //else give the id of previous +1
     {
         fin.seekg(-1100,ios::cur);
         fin.read((char*)&t2,sizeof(ticket));
         cout<<"pre id is"<<t2.tic_id<<t2.c1.c_name;
         t1.tic_id=t2.tic_id+1;
-
     }
     cout<<"id is "<<t1.tic_id;
-    fout.write((char*)&t1,sizeof(ticket));
-    fin.close();
-    fout.close();
-    fin.open("movie.dat",ios::in|ios::out|ios::binary);
-    fin.seekg(((t1.show_cd-1)*sizeof(show)),ios::beg);
-    fin.write((char*)&(t1.s1),(sizeof(show)));
-    fin.close();
+    getch();
+    if(t1.n_o_t>(t1.s1.tno_s-t1.s1.s_res))      //check if the required no of seats are available
+    {
+        system("cls");
+        char ans;
+        cout<<"THE ASKED NO OF SEATS ARE NOT AVAILABLE"<<endl
+            <<"DO YOU WANT TO BOOK THE SEATS IN THE WAITLIST (Y/N): ";
+        cin>>ans;
+        if(ans=='n'||ans=='N')
+        {
+            cout<<"THANK YOU ";
+        }
+        else
+        {
+            t1.waitlist();
+            //now append the new record generated
+            fstream fout;                   //write the updated details in the file
+            fout.open("details.dat",ios::app|ios::binary);
+            fout.write((char*)&t1,sizeof(ticket));
+            fout.close();
+        }
+    }
+    else//book the tickets
+    {
+        t1.book();                  //go to the booking theature and select the wanted seats and get the selected seats
+
+        fstream fout;                   //write the updated details in the file
+        fout.open("details.dat",ios::app|ios::binary);
+        fout.write((char*)&t1,sizeof(ticket));
+        fout.close();
+
+        fout.open("movie.dat",ios::in|ios::out|ios::binary);        //over write the details of the updated seats
+        fout.seekg(((t1.show_cd-1)*sizeof(show)),ios::beg);
+        fout.write((char*)&(t1.s1),(sizeof(show)));
+        fout.close();
+    }
 
     //cout<<t1.tic_id;
     getch();
+}
+
+void canc_tics()
+{
+    system("cls");
+    int id;
+    ticket t1;
+    show sh1;
+    cout<<"ENTER THE TICKET ID:";
+    cin>>id;
+    fstream fd;
+    fd.open("details.dat",ios::in|ios::binary);
+    fd.seekg((sizeof(ticket)*(id-1)),ios::beg);
+    fd.read((char*)&t1,sizeof(ticket));
+    t1.print();
+
+    cout<<"\nDO YOU WANT TO CANCEL THE TICKET (Y/N):";
+    char ans;
+    cin>>ans;
+
+
+    if(ans=='y'||ans=='Y')
+    {
+        sh1.get_det(t1.show_cd);            //get the details of the show
+        fstream fw;                         //open the wait list file
+        switch(t1.show_cd)
+        {
+            case 1 :fw.open("show1.dat",ios::in|ios::binary);
+                break;
+            case 2 :fw.open("show2.dat",ios::in|ios::binary);
+                break;
+            case 3 :fw.open("show3.dat",ios::in|ios::binary);
+                break;
+            case 4 :fw.open("show4.dat",ios::in|ios::binary);
+                break;
+            case 5 :fw.open("show5.dat",ios::in|ios::binary);
+                break;
+            default: ;
+        }
+        queue <int> waitList;
+        int a_id;
+        while(fw.read((char*)&a_id,sizeof(int)))            //generate the queue from the file for various operations
+        {
+            waitList.push(a_id);
+        }
+        fw.close();             //close the wait list file
+
+        int r,c;
+        for(int i=0;i<10;i++)
+        {
+           if(t1.chairs[0][i]==-2)                  //seats are booked in wait list
+           {
+               //delete the id from the wait list
+                queue <int> temp;
+                int a;
+                while(!waitList.empty())
+                {
+                    a=waitList.front();
+                    if(a!=t1.tic_id)
+                    {
+                        temp.push(a);
+                    }
+                    waitList.pop();
+                }
+                swap(waitList,temp);
+
+           }
+           else if(t1.chairs[0][i]==-3)                //do nothing seats already canceled
+           {
+                cout<<"seats already canceled";
+                break;
+           }
+           else if(t1.chairs[0][i]==-1)
+           {
+               //do nothing no seat booked
+           }
+           else                                 //allot this seat to the the first in wait list
+           {
+               //allot this seat to the wait list
+                r=t1.chairs[0][i];
+                c=t1.chairs[1][i];
+                if(waitList.empty())
+                {
+                    sh1.seat[r][c]=0;
+                    sh1.s_res=sh1.s_res-1;
+                }
+                else
+                {
+                    a_id=waitList.front();
+                    allot(r,c,a_id);
+                    waitList.pop();
+                }
+           }
+           t1.chairs[0][i]=-3;         //change the status of the seats to -3 i.e canceled
+           t1.chairs[1][i]=-3;         //change the status of the seats to -3 i.e canceled
+        }
+
+
+        fstream fd,fm;
+        fd.open("details.dat",ios::in|ios::out|ios::binary);    //rewrite the record in details file
+        fd.seekg((sizeof(ticket)*(t1.tic_id-1)),ios::beg);
+        fd.write((char*)&t1,sizeof(ticket));
+        fd.close();
+
+        fm.open("movie.dat",ios::in|ios::out|ios::binary);      //rewrite the movie file
+        fm.seekg((sizeof(show)*(t1.show_cd-1)),ios::beg);
+        fm.write((char*)&sh1,sizeof(show));
+        fm.close();
+
+        switch(t1.show_cd)                                     //rewrite the wait list
+        {
+            case 1 :fw.open("show1.dat",ios::out|ios::binary);
+                break;
+            case 2 :fw.open("show2.dat",ios::out|ios::binary);
+                break;
+            case 3 :fw.open("show3.dat",ios::out|ios::binary);
+                break;
+            case 4 :fw.open("show4.dat",ios::out|ios::binary);
+                break;
+            case 5 :fw.open("show5.dat",ios::out|ios::binary);
+                break;
+            default: ;
+        }
+        int x;
+        while(!waitList.empty())
+        {
+            x=waitList.front();
+            waitList.pop();
+            fw.write((char*)&x,sizeof(x));
+        }
+        fw.close();
+
+        cout<<"\n cancellation completed";
+        getch();
+    }
+
+}
+
+void allot(int r,int c,int a_id)
+{
+    ticket ta;
+    fstream fa;
+    fa.open("details.dat",ios::in|ios::out|ios::binary);
+    fa.seekg((sizeof(ticket)*(a_id-1)),ios::beg);
+    fa.read((char*)&ta,sizeof(ticket));
+    for(int i=0;i<10;i++)
+    {
+        if(ta.chairs[0][i]==-2)
+        {
+            ta.chairs[0][i]=r;
+            ta.chairs[1][i]=c;
+            break;
+        }
+    }
+    fa.seekg((sizeof(ticket)*(a_id-1)),ios::beg);
+    fa.write((char*)&ta,sizeof(ticket));
+    fa.close();
 }
 
 void seats(int cd)           //displays the seating arrangement and return nothing to the called place
