@@ -88,7 +88,6 @@ public:
         getch();
     }
 
-
 };
 
 class customer
@@ -119,14 +118,14 @@ public:
             this->chairs[1][i]=-1;
         }
     }
-    void book()                 //working on right now
+    void book()                 //book your tickets
     {
         //cout<<"hello book your ticket";
         getch();
         system("cls");
-        seats(this->show_cd);             //displays the theature and return the control
+        seats(this->show_cd);             //displays the theater and return the control
 
-        this->mov();                        //choose the dezired seats
+        this->mov();                        //choose the desired seats
         getch();
 
     }
@@ -153,6 +152,7 @@ public:
                 else                        //if already reserved
                     SetColor(9);            //blue
                 printf("|%2d|",i+1);
+                flag=1;
             }
             switch(a)
             {
@@ -215,7 +215,7 @@ public:
         }
         gotoxy(40,40);                          //moves to pointer to the position out of the layout
     }
-    void get_det()
+    void get_det()              //takes the details of the customer
     {
         char ans='N';
         int check=1,i=0;
@@ -344,23 +344,17 @@ public:
         if(ans=='y'||ans=='Y')
         {
             //fw.write((char*)&(this->tic_id),sizeof(this->tic_id));
-            for(int i=1;i<=this->n_o_t;i++)
+            for(int i=0;i<=this->n_o_t;i++)
             {
                 this->chairs[0][i]=-2;              //set the status of the seats to be waiting
                 fw.write((char*)&(this->tic_id),sizeof(this->tic_id));
             }
         }
         fw.close();
-        getch();
+        //getch();
     }
 
-    void cancel()
-    {
-        int d_id;
-        cout<<"enter";
-    }
 
-    get();
 };
 
 int main()
@@ -545,17 +539,18 @@ void book_ticket()              //accept the info book the asked seats
     fin.seekg(0,ios::end);
     if(fin.tellg()==0)                          //if it is the first record give the id 1
     {
-        cout<<"first rec"<<fin.tellg();
+        //cout<<"first rec"<<fin.tellg();
         t1.tic_id=1;
     }
     else                                        //else give the id of previous +1
     {
         fin.seekg(-1100,ios::cur);
         fin.read((char*)&t2,sizeof(ticket));
-        cout<<"pre id is"<<t2.tic_id<<t2.c1.c_name;
+       // cout<<"pre id is"<<t2.tic_id<<t2.c1.c_name;
         t1.tic_id=t2.tic_id+1;
     }
-    cout<<"id is "<<t1.tic_id;
+    cout<<"ticket id is "<<t1.tic_id;
+    cout<<"\npress any key to continue";
     getch();
     if(t1.n_o_t>(t1.s1.tno_s-t1.s1.s_res))      //check if the required no of seats are available
     {
@@ -593,7 +588,7 @@ void book_ticket()              //accept the info book the asked seats
         fout.close();
     }
 
-    //cout<<t1.tic_id;
+    cout<<"press any key to continue";
     getch();
 }
 
@@ -647,7 +642,7 @@ void canc_tics()
         {
            if(t1.chairs[0][i]==-2)                  //seats are booked in wait list
            {
-               //delete the id from the wait list
+                //delete the id from the wait list
                 queue <int> temp;
                 int a;
                 while(!waitList.empty())
@@ -728,6 +723,7 @@ void canc_tics()
         fw.close();
 
         cout<<"\n cancellation completed";
+        cout<<"\n press any key to continue";
         getch();
     }
 
